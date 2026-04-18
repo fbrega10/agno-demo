@@ -1,0 +1,3 @@
+agno[mistral,sqlite]
+ddgs 
+wikipedia
