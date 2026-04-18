@@ -1,30 +1,84 @@
-# Agno Demo
+# Agno Agentic Demo
 
-Demo minimale di un agente costruito con Agno che:
+Questo repository mostra una piccola applicazione di Agentic AI costruita con **Agno**.
+L'agente non si limita a generare testo: riceve un obiettivo, usa tool esterni, mantiene contesto operativo e compone un risultato finale attraverso piu passaggi.
 
-- recupera le top story di Hacker News
-- classifica ogni titolo in una categoria tecnica
-- approfondisce il tema principale della prima notizia tramite Wikipedia
-- produce un breve bollettino tech in italiano
+In questa demo il workflow agentico parte da Hacker News, interpreta le notizie, le classifica, approfondisce il tema principale con Wikipedia e genera un bollettino tech in italiano.
 
-Il progetto serve come esempio compatto di orchestrazione di tool esterni con memoria locale persistente tramite SQLite.
+## Perche e un'applicazione agentica
 
-## Cosa fa
+Il progetto mette in evidenza alcuni elementi centrali di un **agentic workflow**:
 
-Il file principale [`agno_demo_hn.py`](./agno_demo_hn.py) definisce un agente con:
+- **goal-oriented execution**: l'agente riceve un task composito e lo porta a termine orchestrando piu azioni
+- **tool use**: usa sorgenti esterne durante il processo, non solo conoscenza interna del modello
+- **multi-step reasoning**: combina raccolta dati, classificazione, approfondimento e sintesi finale
+- **memory and context**: usa storico e persistenza locale per mantenere continuita di esecuzione
+- **final synthesis**: trasforma dati eterogenei in un output leggibile e coerente
 
-- modello `MistralChat("mistral-small-latest")`
-- tool di Agno per Hacker News
-- tool di Agno per Wikipedia
-- una funzione custom `classify_topic()` per classificare i titoli
-- database SQLite locale in `tmp/agno_demo.db`
+Il punto chiave della demo e proprio questo: mostra come **Agno** consenta di costruire applicazioni in cui il modello agisce come un agente operativo, non come un semplice generatore di testo.
 
-Alla fine dello script viene eseguita una richiesta che:
+## Workflow dell'agente
 
-1. recupera le prime 3 notizie da Hacker News
-2. assegna una categoria a ciascun titolo
-3. cerca su Wikipedia il tema della prima notizia
-4. genera un riepilogo finale in italiano
+Lo script [`agno_demo_hn.py`](./agno_demo_hn.py) definisce un agente che:
+
+1. recupera le top story da Hacker News
+2. classifica ogni titolo con una funzione custom
+3. approfondisce via Wikipedia il tema della prima notizia
+4. sintetizza tutto in un bollettino tech in italiano
+
+Questo flusso rappresenta una pipeline agentica compatta ma concreta, in cui un singolo agente coordina tool, logica applicativa e generazione finale.
+
+## Agno come framework agentico
+
+L'applicazione sfrutta Agno per combinare:
+
+- definizione dell'agente
+- istruzioni operative
+- uso di tool esterni
+- memoria conversazionale
+- persistenza locale con SQLite
+- output Markdown in streaming
+
+Lo stack attuale comprende:
+
+- `Agent` di Agno come orchestratore del workflow
+- `HackerNewsTools` per il recupero delle notizie
+- `WikipediaTools` per l'arricchimento contestuale
+- `classify_topic()` come tool custom di dominio
+- `SqliteDb('tmp/agno_demo.db')` per memoria e storico locale
+
+## Modello LLM intercambiabile
+
+Nel codice corrente il backend configurato e:
+
+```python
+MistralChat("mistral-small-latest")
+```
+
+Ma il progetto non e legato a Mistral come scelta architetturale.
+La vera base dell'applicazione e **Agno** con il suo approccio agentico. Il provider LLM puo essere sostituito in base alle esigenze del caso d'uso.
+
+Lo stesso workflow puo essere adattato anche ad altri modelli o provider, ad esempio:
+
+- OpenAI
+- Groq
+- Anthropic
+- Gemini
+- altri backend compatibili supportati da Agno
+
+In pratica: il modello cambia, il workflow agentico resta.
+
+## Cosa dimostra questa demo
+
+Questo repository mostra come costruire un agente capace di:
+
+- usare tool multipli in una singola esecuzione
+- arricchire il ragionamento con dati live
+- comporre task sequenziali orientati a un obiettivo
+- conservare memoria locale
+- produrre un output finale pronto per l'utente
+
+E una base efficace per chi vuole iniziare a sviluppare applicazioni di **Agentic AI**, **tool-augmented reasoning** e **LLM orchestration** con Agno.
 
 ## Struttura del repository
 
@@ -38,40 +92,33 @@ Alla fine dello script viene eseguita una richiesta che:
 ## Requisiti
 
 - Python 3.10+ consigliato
-- una chiave API per Mistral
-- accesso a Internet durante l'esecuzione, perché lo script usa servizi esterni
+- accesso a Internet durante l'esecuzione
+- una chiave API per il provider LLM scelto
 
-Nota: la variabile d'ambiente non è documentata nel repository, ma per l'uso standard del modello Mistral con Agno è tipicamente `MISTRAL_API_KEY`.
-
-## Installazione
-
-Crea un ambiente virtuale e installa le dipendenze:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Imposta poi la chiave API:
+Nel codice attuale e usato Mistral, quindi serve tipicamente:
 
 ```bash
 export MISTRAL_API_KEY="la_tua_chiave_api"
 ```
 
-## Esecuzione
+Se sostituisci il modello con un altro backend Agno, dovrai configurare la relativa API key.
 
-Avvia lo script con:
+## Installazione
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+mkdir -p tmp
+```
+
+## Esecuzione
 
 ```bash
 python agno_demo_hn.py
 ```
 
-Se la cartella `tmp/` non esiste, creala prima:
-
-```bash
-mkdir -p tmp
-```
+All'avvio, l'agente esegue direttamente il workflow completo e stampa il risultato in streaming sul terminale.
 
 ## Dipendenze
 
@@ -81,44 +128,16 @@ Le dipendenze dichiarate in [`requirements.txt`](./requirements.txt) sono:
 - `ddgs`
 - `wikipedia`
 
-## Logica di classificazione
+## Evoluzioni possibili
 
-La funzione `classify_topic(title: str) -> str` assegna ogni titolo a una delle seguenti categorie:
+Questa base puo essere estesa verso applicazioni agentiche piu ricche, ad esempio:
 
-- `ai`
-- `web`
-- `security`
-- `business`
-- `hardware`
-- `other`
-
-La classificazione usa un semplice matching di parole chiave nel titolo. E adatta a una demo, ma resta limitata rispetto a un classificatore semantico.
-
-## Output atteso
-
-L'output viene stampato in streaming sul terminale in formato Markdown. In pratica include:
-
-- elenco delle top story recuperate
-- categoria assegnata a ciascun titolo
-- breve approfondimento sul tema principale tramite Wikipedia
-- sintesi finale in italiano
-
-## Limiti attuali
-
-- lo script è monolitico e non parametrico
-- il prompt è hardcoded nel file Python
-- la classificazione è basata solo su keyword
-- non sono presenti test automatici
-- non c'è gestione esplicita degli errori per API key mancanti o problemi di rete
-
-## Possibili estensioni
-
-- rendere configurabile il numero di news da analizzare
-- aggiungere una CLI con argomenti
-- salvare il report finale su file
-- migliorare la classificazione con embedding o LLM routing
-- aggiungere test per `classify_topic()`
+- newsletter tech generate automaticamente
+- agenti di monitoraggio news per domini specifici
+- research assistant con piu tool
+- workflow multi-step piu articolati
+- architetture multi-agent
 
 ## Licenza
 
-Nel repository non è presente un file di licenza. Se il progetto deve essere condiviso o riutilizzato, conviene aggiungerne una esplicita.
+Questo progetto e distribuito sotto licenza [MIT](./LICENSE).
