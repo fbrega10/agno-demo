@@ -5,6 +5,14 @@ mcp = FastMCP("topic_classifier")
 
 @mcp.tool()
 def classify_topic(title: str) -> str:
+    """This function classifies a title based on its words
+
+    Args:
+        title (str): The title to be classified
+
+    Returns:
+        str: the corresponding topic
+    """
     title = title.lower()
 
     topics = {
