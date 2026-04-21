@@ -1,3 +1,4 @@
 agno[mistral,sqlite]
 ddgs 
 wikipedia
+mcp

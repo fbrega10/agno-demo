@@ -1,109 +1,78 @@
-# Agno Agentic Demo
+# Agno Agentic Demo 🚀
 
-Questo repository mostra una piccola applicazione di Agentic AI costruita con **Agno**.
-L'agente non si limita a generare testo: riceve un obiettivo, usa tool esterni, mantiene contesto operativo e compone un risultato finale attraverso piu passaggi.
+> A compact agentic app built with **Agno** that pulls live tech news, classifies topics through a custom **MCP** tool, enriches the context with **Wikipedia**, and turns everything into an Italian tech bulletin with serious AI-native energy. 🤖
 
-In questa demo il workflow agentico parte da Hacker News, interpreta le notizie, le classifica, approfondisce il tema principale con Wikipedia e genera un bollettino tech in italiano.
+## Why This Repo Is Cool ✨
 
-## Perche e un'applicazione agentica
+This repository is a clean and concrete showcase of what a real **agentic** experience looks like:
 
-Il progetto mette in evidenza alcuni elementi centrali di un **agentic workflow**:
+- 🧠 an agent with a clear objective
+- 🔧 external tools orchestrated in a single workflow
+- 🌐 live data gathered during execution
+- 🗂️ local memory with SQLite persistence
+- 📰 a final output that is readable, useful, and shareable
 
-- **goal-oriented execution**: l'agente riceve un task composito e lo porta a termine orchestrando piu azioni
-- **tool use**: usa sorgenti esterne durante il processo, non solo conoscenza interna del modello
-- **multi-step reasoning**: combina raccolta dati, classificazione, approfondimento e sintesi finale
-- **memory and context**: usa storico e persistenza locale per mantenere continuita di esecuzione
-- **final synthesis**: trasforma dati eterogenei in un output leggibile e coerente
+This is not just a script that generates text. The model **acts**, uses tools, expands context, and assembles a final result through a modern and elegant pipeline.
 
-Il punto chiave della demo e proprio questo: mostra come **Agno** consenta di costruire applicazioni in cui il modello agisce come un agente operativo, non come un semplice generatore di testo.
+## What It Does 🕹️
 
-## Workflow dell'agente
+The application runs a super clean workflow:
 
-Lo script [`agno_demo_hn.py`](./agno_demo_hn.py) definisce un agente che:
+1. fetches the top stories from Hacker News
+2. classifies each title with `classify_topic`
+3. explores the main topic with Wikipedia
+4. generates an Italian tech bulletin in Markdown
 
-1. recupera le top story da Hacker News
-2. classifica ogni titolo con una funzione custom
-3. approfondisce via Wikipedia il tema della prima notizia
-4. sintetizza tutto in un bollettino tech in italiano
+The result is a small but sharp showcase of how **Agno** can turn an LLM demo into a real **agentic application**.
 
-Questo flusso rappresenta una pipeline agentica compatta ma concreta, in cui un singolo agente coordina tool, logica applicativa e generazione finale.
+## Stack Nerd 💾
 
-## Agno come framework agentico
+- `Agno Agent` as the central orchestrator
+- `MistralChat("mistral-small-latest")` as the current model
+- `HackerNewsTools` for the news feed
+- `WikipediaTools` for context enrichment
+- `MCPTools` to connect the custom MCP server
+- `FastMCP` to expose the `classify_topic` tool
+- `SqliteDb("tmp/agno_demo.db")` for local memory and history
 
-L'applicazione sfrutta Agno per combinare:
+## Architecture Vibes 🧩
 
-- definizione dell'agente
-- istruzioni operative
-- uso di tool esterni
-- memoria conversazionale
-- persistenza locale con SQLite
-- output Markdown in streaming
-
-Lo stack attuale comprende:
-
-- `Agent` di Agno come orchestratore del workflow
-- `HackerNewsTools` per il recupero delle notizie
-- `WikipediaTools` per l'arricchimento contestuale
-- `classify_topic()` come tool custom di dominio
-- `SqliteDb('tmp/agno_demo.db')` per memoria e storico locale
-
-## Modello LLM intercambiabile
-
-Nel codice corrente il backend configurato e:
-
-```python
-MistralChat("mistral-small-latest")
+```text
+Hacker News ──┐
+              ├──> Agno Agent ───> Italian Tech Bulletin
+Wikipedia ────┤
+              │
+MCP Server ───┘
+   classify_topic()
 ```
 
-Ma il progetto non e legato a Mistral come scelta architetturale.
-La vera base dell'applicazione e **Agno** con il suo approccio agentico. Il provider LLM puo essere sostituito in base alle esigenze del caso d'uso.
+This demo has the feel of a modern agentic lab: compact, readable, extensible, and perfect for showing **tool use**, **multi-step reasoning**, and **real orchestration**.
 
-Lo stesso workflow puo essere adattato anche ad altri modelli o provider, ad esempio:
-
-- OpenAI
-- Groq
-- Anthropic
-- Gemini
-- altri backend compatibili supportati da Agno
-
-In pratica: il modello cambia, il workflow agentico resta.
-
-## Cosa dimostra questa demo
-
-Questo repository mostra come costruire un agente capace di:
-
-- usare tool multipli in una singola esecuzione
-- arricchire il ragionamento con dati live
-- comporre task sequenziali orientati a un obiettivo
-- conservare memoria locale
-- produrre un output finale pronto per l'utente
-
-E una base efficace per chi vuole iniziare a sviluppare applicazioni di **Agentic AI**, **tool-augmented reasoning** e **LLM orchestration** con Agno.
-
-## Struttura del repository
+## Repository Map 🗺️
 
 ```text
 .
-├── agno_demo_hn.py
+├── agent.py
+├── mcp_server.py
 ├── requirements.txt
 └── README.md
 ```
 
-## Requisiti
+## Files At A Glance 📁
 
-- Python 3.10+ consigliato
-- accesso a Internet durante l'esecuzione
-- una chiave API per il provider LLM scelto
+### `agent.py`
 
-Nel codice attuale e usato Mistral, quindi serve tipicamente:
+Defines the Agno agent, wires the tools together, and runs the full workflow.
 
-```bash
-export MISTRAL_API_KEY="la_tua_chiave_api"
-```
+### `mcp_server.py`
 
-Se sostituisci il modello con un altro backend Agno, dovrai configurare la relativa API key.
+Exposes an MCP server with the custom `classify_topic` tool, useful for quickly tagging tech headlines into categories such as `ai`, `web`, `security`, `business`, and `hardware`.
 
-## Installazione
+### `requirements.txt`
+
+Lists the dependencies required to run the demo.
+
+## Quickstart ⚡
 
 ```bash
 python -m venv .venv
@@ -112,32 +81,44 @@ pip install -r requirements.txt
 mkdir -p tmp
 ```
 
-## Esecuzione
+## Run The Magic 🪄
+
+Start the MCP server first:
 
 ```bash
-python agno_demo_hn.py
+python mcp_server.py
 ```
 
-All'avvio, l'agente esegue direttamente il workflow completo e stampa il risultato in streaming sul terminale.
+Then, in another terminal:
 
-## Dipendenze
+```bash
+python agent.py
+```
 
-Le dipendenze dichiarate in [`requirements.txt`](./requirements.txt) sono:
+The agent runs the complete workflow and streams an Italian tech bulletin straight to the terminal with strong AI engineer dashboard vibes. 📡
 
-- `agno[mistral,sqlite]`
-- `ddgs`
-- `wikipedia`
+## Why Agno Here Hits Different 🔥
 
-## Evoluzioni possibili
+With Agno, this repository packs several core agentic AI ideas into just a few files:
 
-Questa base puo essere estesa verso applicazioni agentiche piu ricche, ad esempio:
+- agent orchestration
+- external tool integration
+- MCP interoperability
+- live information gathering
+- contextual enrichment
+- persistent memory
+- user-ready final synthesis
 
-- newsletter tech generate automaticamente
-- agenti di monitoraggio news per domini specifici
-- research assistant con piu tool
-- workflow multi-step piu articolati
-- architetture multi-agent
+That is what makes the project interesting: it is small enough to understand quickly, yet rich enough to demonstrate the real potential of an **agent-first** application.
 
-## Licenza
+## Great Starting Point For 🚧
 
-Questo progetto e distribuito sotto licenza [MIT](./LICENSE).
+- automated tech newsletters
+- vertical research assistants
+- monitoring and reporting workflows
+- MCP + Agno portfolio demos
+- multi-tool agent experiments
+
+## Final Take 👾
+
+If you want a repository that immediately signals **Agentic AI** energy, this one lands the point: a small codebase, a clear idea, smart integrations, and a workflow that shows how **Agno** can turn a simple prompt into a real operational application.

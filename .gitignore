@@ -113,3 +113,7 @@ Pipfile.lock
 # Backup files
 *.bak
 *.tmp
+
+# Binary files from pip
+bin/*
+pyvenv.cfg
