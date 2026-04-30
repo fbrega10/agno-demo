@@ -1,124 +1,105 @@
-# Agno Agentic Demo 🚀
+# Agno Agentic Demo
 
-> A compact agentic app built with **Agno** that pulls live tech news, classifies topics through a custom **MCP** tool, enriches the context with **Wikipedia**, and turns everything into an Italian tech bulletin with serious AI-native energy. 🤖
+An agentic application built on [Agno](https://github.com/agno-agi/agno) that pairs a Mistral-powered agent with a custom MCP server to deliver Italian-language tech analysis. The agent fetches Hacker News stories, classifies their topic, enriches context from Wikipedia, and retrieves live stock quotes from Yahoo Finance — all orchestrated through a single workflow.
 
-## Why This Repo Is Cool ✨
+## Features
 
-This repository is a clean and concrete showcase of what a real **agentic** experience looks like:
+- **Agent orchestration** — a single Agno agent drives the workflow, selects tools, and reasons over their outputs.
+- **Custom MCP server** — exposes `classify_topic` and `get_live_stock` over the streamable-HTTP transport.
+- **Live market data** — natural-language stock requests are parsed by the model, the ticker is extracted, and the quote is resolved through `yfinance`.
+- **Context enrichment** — on-demand Wikipedia lookups widen topic coverage.
+- **Persistent memory** — conversation history is stored in SQLite, keeping continuity across runs.
 
-- 🧠 an agent with a clear objective
-- 🔧 external tools orchestrated in a single workflow
-- 🌐 live data gathered during execution
-- 🗂️ local memory with SQLite persistence
-- 📰 a final output that is readable, useful, and shareable
-
-This is not just a script that generates text. The model **acts**, uses tools, expands context, and assembles a final result through a modern and elegant pipeline.
-
-## What It Does 🕹️
-
-The application runs a super clean workflow:
-
-1. fetches the top stories from Hacker News
-2. classifies each title with `classify_topic`
-3. explores the main topic with Wikipedia
-4. generates an Italian tech bulletin in Markdown
-
-The result is a small but sharp showcase of how **Agno** can turn an LLM demo into a real **agentic application**.
-
-## Stack Nerd 💾
-
-- `Agno Agent` as the central orchestrator
-- `MistralChat("mistral-small-latest")` as the current model
-- `HackerNewsTools` for the news feed
-- `WikipediaTools` for context enrichment
-- `MCPTools` to connect the custom MCP server
-- `FastMCP` to expose the `classify_topic` tool
-- `SqliteDb("tmp/agno_demo.db")` for local memory and history
-
-## Architecture Vibes 🧩
+## Architecture
 
 ```text
-Hacker News ──┐
-              ├──> Agno Agent ───> Italian Tech Bulletin
-Wikipedia ────┤
-              │
-MCP Server ───┘
-   classify_topic()
+   Hacker News ──┐
+                 │
+   Wikipedia ────┼──▶  Agno Agent  ──▶  Italian briefing / answer
+                 │           ▲
+   MCP Server ───┘           │
+   ├─ classify_topic ────────┘
+   └─ get_live_stock ──▶ yfinance ──▶ live market data
 ```
 
-This demo has the feel of a modern agentic lab: compact, readable, extensible, and perfect for showing **tool use**, **multi-step reasoning**, and **real orchestration**.
-
-## Repository Map 🗺️
+## Project Structure
 
 ```text
 .
-├── agent.py
-├── mcp_server.py
-├── requirements.txt
+├── agent.py            # Agno agent entrypoint
+├── mcp_server.py       # FastMCP server (classify_topic, get_live_stock)
+├── requirements.txt    # Python dependencies
 └── README.md
 ```
 
-## Files At A Glance 📁
+## Stack
 
-### `agent.py`
+| Component | Role |
+|-----------|------|
+| `agno.Agent` | Orchestration and reasoning loop |
+| `MistralChat("mistral-small-latest")` | LLM backend |
+| `HackerNewsTools` | News retrieval |
+| `WikipediaTools` | Context enrichment |
+| `MCPTools` | MCP client (streamable-HTTP) |
+| `FastMCP` | MCP server runtime |
+| `yfinance` | Live market quotes |
+| `SqliteDb` | Conversation persistence (`tmp/agno_demo.db`) |
 
-Defines the Agno agent, wires the tools together, and runs the full workflow.
+## Prerequisites
 
-### `mcp_server.py`
+- Python 3.10 or newer
+- A valid `MISTRAL_API_KEY` available in the environment
 
-Exposes an MCP server with the custom `classify_topic` tool, useful for quickly tagging tech headlines into categories such as `ai`, `web`, `security`, `business`, and `hardware`.
-
-### `requirements.txt`
-
-Lists the dependencies required to run the demo.
-
-## Quickstart ⚡
+## Installation
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 mkdir -p tmp
+export MISTRAL_API_KEY="your-key-here"
 ```
 
-## Run The Magic 🪄
+## Usage
 
-Start the MCP server first:
+Start the MCP server in one terminal:
 
 ```bash
 python mcp_server.py
 ```
 
-Then, in another terminal:
+The server listens on `http://localhost:8000/mcp` (streamable-HTTP transport).
+
+In a second terminal, launch the agent:
 
 ```bash
 python agent.py
 ```
 
-The agent runs the complete workflow and streams an Italian tech bulletin straight to the terminal with strong AI engineer dashboard vibes. 📡
+The agent prompts for an input query and streams the response in Italian, invoking Hacker News, Wikipedia, and the MCP tools as needed.
 
-## Why Agno Here Hits Different 🔥
+## How Stock Detection Works
 
-With Agno, this repository packs several core agentic AI ideas into just a few files:
+The agent's system instructions teach it to recognise natural-language stock requests, extract the ticker symbol (e.g. `AAPL`, `MSFT`, `TSLA`) directly from the prompt, and invoke `get_live_stock` with that symbol. There is no static mapping or fixed grammar: tool selection is driven by the model's reasoning over the user message and the tool descriptions exposed by the MCP server.
 
-- agent orchestration
-- external tool integration
-- MCP interoperability
-- live information gathering
-- contextual enrichment
-- persistent memory
-- user-ready final synthesis
+## MCP Tools
 
-That is what makes the project interesting: it is small enough to understand quickly, yet rich enough to demonstrate the real potential of an **agent-first** application.
+### `classify_topic(title: str) -> str`
 
-## Great Starting Point For 🚧
+Tags a headline into one of: `ai`, `web`, `security`, `business`, `hardware`, or `other`, based on a lightweight keyword match.
+
+### `get_live_stock(stock: str) -> str`
+
+Takes a ticker symbol and returns the current price and currency from Yahoo Finance via `yfinance`. Returns a clear error message when the ticker cannot be resolved.
+
+## Suitable Starting Points For
 
 - automated tech newsletters
 - vertical research assistants
 - monitoring and reporting workflows
-- MCP + Agno portfolio demos
 - multi-tool agent experiments
+- Agno + MCP portfolio demos
 
-## Final Take 👾
+## Notes
 
-If you want a repository that immediately signals **Agentic AI** energy, this one lands the point: a small codebase, a clear idea, smart integrations, and a workflow that shows how **Agno** can turn a simple prompt into a real operational application.
+The repository is intentionally compact: a small surface area that demonstrates agent orchestration, MCP interoperability, live information gathering, and persistent memory in an idiomatic Agno setup.
