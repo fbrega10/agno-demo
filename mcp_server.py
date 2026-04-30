@@ -1,4 +1,5 @@
 from mcp.server.fastmcp import FastMCP
+import yfinance as yf
 
 mcp = FastMCP("topic_classifier")
 
@@ -27,6 +28,28 @@ def classify_topic(title: str) -> str:
         if any(word in keywords for word in title.split()):
             return topic
     return "other"
+
+
+@mcp.tool()
+def get_live_stock(stock: str) -> str:
+    """Retrieves the live stock price for a given ticker symbol.
+
+    Args:
+        stock (str): ticker symbol (e.g. AAPL, MSFT, TSLA)
+
+    Returns:
+        str: current price with currency, or error message if ticker not found
+    """
+    ticker = stock.upper().strip()
+    try:
+        info = yf.Ticker(ticker).fast_info
+        price = info.last_price
+        currency = info.currency
+        if price is None:
+            return f"No price data available for '{ticker}'. Check the ticker symbol."
+        return f"{ticker}: {price:.2f} {currency}"
+    except Exception as e:
+        return f"Could not retrieve stock data for '{ticker}': {e}"
 
 
 if __name__ == "__main__":

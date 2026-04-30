@@ -117,3 +117,6 @@ Pipfile.lock
 # Binary files from pip
 bin/*
 pyvenv.cfg
+
+#Claude code
+.claude/*

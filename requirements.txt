@@ -1,4 +1,5 @@
 agno[mistral,sqlite]
-ddgs 
+ddgs
 wikipedia
 mcp
+yfinance

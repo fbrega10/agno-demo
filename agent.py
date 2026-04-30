@@ -21,6 +21,8 @@ async def main() -> None:
                 "Usa get_top_hackernews_stories per le notizie.",
                 "Usa classify_topic per classificare ogni titolo.",
                 "Usa search_wikipedia per approfondire un argomento.",
+                "Usa get_live_stock quando l'utente chiede il prezzo o la quotazione di un'azione: "
+                "estrai il ticker (es. AAPL, MSFT, TSLA) dalla richiesta e passalo al tool.",
             ],
             tools=[HackerNewsTools().get_top_hackernews_stories, mcp_tools, WikipediaTools()],
             db=SqliteDb("tmp/agno_demo.db"),
@@ -29,11 +31,20 @@ async def main() -> None:
             add_history_to_context=True,
         )
 
+        query = input("Richiedi il valore di quotazione in borsa di un'azienda: \n")
+        await agent.aprint_response(
+            query,
+            stream=True
+        )
+
+        """
         await agent.aprint_response(
             "Recupera le top 3 story da Hacker News, classifica ciascuna per categoria, "
             "poi cerca su Wikipedia il tema della prima story e scrivi un bollettino tech in italiano.",
             stream=True,
         )
+        """
+
     finally:
         await mcp_tools.close()
 
